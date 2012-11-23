@@ -17,7 +17,7 @@ from fnmatch import fnmatch
 import distutils.sysconfig
 import compileall
 
-PYTHON_PACKAGE_DIR=distutils.sysconfig.get_python_lib()
+PYTHON_PACKAGE_DIR=distutils.sysconfig.get_python_lib(True, False, '$(PREFIX)')
 BUILD_DIR='build'
 REV_BUILD_DIR='..'
 SRC_DIR='src'
@@ -811,6 +811,7 @@ def mk_install(out):
     out.write('\t@mkdir -p $(PREFIX)/bin\n')
     out.write('\t@mkdir -p $(PREFIX)/include\n')
     out.write('\t@mkdir -p $(PREFIX)/lib\n')
+    out.write('\t@mkdir -p %s\n' % PYTHON_PACKAGE_DIR)
     for c in get_components():
         c.mk_install(out)
     out.write('\t@cp z3*.pyc %s\n' % PYTHON_PACKAGE_DIR)
