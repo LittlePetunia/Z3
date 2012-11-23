@@ -1,4 +1,6 @@
 AC_INIT([z3], [4.2])
+m4_include([m4/ax_openmp.m4])
+
 AC_CONFIG_SRCDIR(src/util/util.cpp)
 AC_PREFIX_DEFAULT(/usr)
 
@@ -83,7 +85,7 @@ fi
 ###################
 # Sets CXX
 AC_LANG([C++])
-AC_PROG_CXX(g++ clang++ false)
+AC_PROG_CXX(c++ g++ clang++ false)
 AC_PROG_CC
 if test $CXX = "false"; then
    AC_MSG_ERROR([C++ compiler was not found])
@@ -99,20 +101,15 @@ AC_PROG_GREP
 # Sets SED
 AC_PROG_SED
 
-AS_IF([test "$CXX" = "g++"], [
+AX_OPENMP([
    # Enable OpenMP
-   CXXFLAGS+=" -fopenmp"  
-   LDFLAGS+=" -fopenmp"
-   SLIBEXTRAFLAGS+=" -fopenmp"
+   CXXFLAGS+=" $OPENMP_CXXFLAGS"
+   LDFLAGS+=" $OPENMP_CXXFLAGS"
+   SLIBEXTRAFLAGS+=" $OPENMP_CXXFLAGS"
    # Use -mfpmath=sse
    CXXFLAGS+=" -mfpmath=sse"
-],
-      [test "$CXX" = "clang++"], [
-   # OpenMP is not supported in clang++
-   CXXFLAGS+=" -D _NO_OMP_"  
-],
-[
-  AC_MSG_ERROR([Unsupported compiler: $CXX])
+], [
+   CXXFLAGS+=" -D _NO_OMP_"
 ])
 
 AR=ar
